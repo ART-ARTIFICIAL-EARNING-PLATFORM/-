@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ART | Login</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- PREMIUM CSS --- */
+        :root {
+            --bg-deep: #030305;
+            --neon-blue: #00f0ff;
+            --neon-purple: #bc13fe;
+            --glass-bg: rgba(20, 20, 30, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-muted: #8a8a8a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body {
+            background-color: var(--bg-deep);
+            background-image: radial-gradient(circle at 50% 0%, #1a1a2e 0%, #000 80%);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Star Background */
+        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.4; animation: twinkle 4s infinite; }
+        @keyframes twinkle { 50% { opacity: 1; transform: scale(1.5); } }
+
+        /* Login Card */
+        .login-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
+            animation: floatIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .login-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            box-shadow: 0 0 15px var(--neon-blue);
+        }
+
+        h2 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #fff;
+        }
+        
+        h2 span { color: var(--neon-blue); }
+        .subtitle { text-align: center; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 30px; }
+
+        /* Input Fields */
+        .input-group { position: relative; margin-bottom: 20px; }
+        
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            transition: 0.3s;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px 15px 15px 45px; /* Padding left for icon */
+            padding-right: 45px; /* Padding right for eye icon */
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        input:focus + .input-icon { color: var(--neon-blue); }
+
+        /* Password Toggle Eye */
+        .toggle-pass {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 10;
+        }
+        .toggle-pass:hover { color: #fff; }
+
+        /* Options */
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 25px;
+        }
+
+        .remember-wrap { display: flex; align-items: center; cursor: pointer; }
+        .remember-wrap input { width: auto; margin-right: 8px; accent-color: var(--neon-blue); cursor: pointer; }
+
+        /* Button */
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(90deg, var(--neon-blue), #0088aa);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+        }
+
+        .btn-login:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.5);
+        }
+        
+        .btn-login:disabled { background: #333; color: #888; cursor: not-allowed; }
+
+        /* Footer Links */
+        .footer { text-align: center; margin-top: 20px; font-size: 0.9rem; color: var(--text-muted); }
+        .footer a { color: var(--neon-blue); text-decoration: none; font-weight: 600; transition: 0.3s; }
+        .footer a:hover { color: #fff; text-shadow: 0 0 10px var(--neon-blue); }
+
+        /* Animation */
+        @keyframes floatIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Star Background -->
+    <div class="stars" id="starContainer"></div>
+
+    <div class="login-card">
+        <h2>ART <span>ARTIFICIAL</span></h2>
+        <p class="subtitle">Secure Protocol Login</p>
+
+        <!-- Phone Input -->
+        <div class="input-group">
+            <input type="number" id="phone" placeholder="User ID / Mobile Number">
+            <i class="fas fa-user input-icon"></i>
+        </div>
+
+        <!-- Password Input (Fixed Placeholder) -->
+        <div class="input-group">
+            <input type="password" id="password" placeholder="Password">
+            <i class="fas fa-lock input-icon"></i>
+            <i class="fas fa-eye toggle-pass" id="eyeIcon"></i>
+        </div>
+
+        <!-- Remember Me -->
+        <div class="options">
+            <label class="remember-wrap">
+                <input type="checkbox" id="rememberMe">
+                Remember Me
+            </label>
+        </div>
+
+        <!-- Login Button -->
+        <button class="btn-login" id="loginBtn">INITIALIZE</button>
+
+        <!-- Register Link -->
+        <div class="footer">
+            No Account? <a href="registration_account_active.html">Register / Activate</a>
+        </div>
+    </div>
+
+    <!-- JS LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+        // 1. Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDaEHhCD5qym29F8HbXLqrrQ3OpaAP8VVE",
+            authDomain: "artifical-a9b7c.firebaseapp.com",
+            databaseURL: "https://artifical-a9b7c-default-rtdb.firebaseio.com",
+            projectId: "artifical-a9b7c",
+            storageBucket: "artifical-a9b7c.firebasestorage.app",
+            messagingSenderId: "525755884258",
+            appId: "1:525755884258:web:c5619c23fc7be196ea74bb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // 2. Background Stars
+        const starContainer = document.getElementById('starContainer');
+        for(let i=0; i<60; i++){
+            let star = document.createElement('div');
+            star.className = 'star';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.width = Math.random() * 3 + 'px';
+            star.style.height = star.style.width;
+            star.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            starContainer.appendChild(star);
+        }
+
+        // 3. Password Toggle Logic
+        const passInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        eyeIcon.addEventListener('click', () => {
+            if (passInput.type === "password") {
+                passInput.type = "text";
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+                eyeIcon.style.color = "#00f0ff";
+            } else {
+                passInput.type = "password";
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+                eyeIcon.style.color = "#8a8a8a";
+            }
+        });
+
+        // 4. Remember Me - Auto Fill
+        window.addEventListener('load', () => {
+            if (localStorage.getItem('art_user')) {
+                document.getElementById('phone').value = localStorage.getItem('art_user');
+                document.getElementById('password').value = localStorage.getItem('art_pass');
+                document.getElementById('rememberMe').checked = true;
+            }
+        });
+
+        // 5. Login Function
+        document.getElementById('loginBtn').addEventListener('click', () => {
+            const phone = document.getElementById('phone').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            const btn = document.getElementById('loginBtn');
+
+            if (!phone || !pass) {
+                alert("⚠ INPUT REQUIRED: Please enter User ID and Password.");
+                return;
+            }
+
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> VERIFYING...';
+            btn.disabled = true;
+
+            const dbRef = ref(db);
+            get(child(dbRef, `users/${phone}`)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    if (userData.password === pass) {
+                        // Handle Remember Me
+                        if (document.getElementById('rememberMe').checked) {
+                            localStorage.setItem('art_user', phone);
+                            localStorage.setItem('art_pass', pass);
+                        } else {
+                            localStorage.removeItem('art_user');
+                            localStorage.removeItem('art_pass');
+                        }
+
+                        sessionStorage.setItem('currentUser', phone);
+                        
+                        btn.style.background = "#00ff88"; // Green
+                        btn.style.color = "#000";
+                        btn.innerHTML = "ACCESS GRANTED";
+                        
+                        setTimeout(() => {
+                            window.location.href = 'home.html';
+                        }, 1000);
+
+                    } else {
+                        alert("⚠ ACCESS DENIED: Incorrect Password.");
+                        resetBtn();
+                    }
+                } else {
+                    alert("⚠ USER NOT FOUND: Please Register first.");
+                    resetBtn();
+                }
+            }).catch((error) => {
+                console.error(error);
+                alert("⚠ NETWORK ERROR: Check connection.");
+                resetBtn();
+            });
+
+            function resetBtn() {
+                btn.innerHTML = 'INITIALIZE';
+                btn.disabled = false;
+                btn.style.background = "linear-gradient(90deg, #00f0ff, #0088aa)";
+            }
+        });
+    </script>
+</body>
+</html>
