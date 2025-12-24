@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ART | Dashboard</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- PREMIUM GALACTIC THEME --- */
+        :root {
+            --bg-deep: #030305;
+            --neon-blue: #00f0ff;
+            --neon-purple: #bc13fe;
+            --neon-green: #00ff88;
+            --neon-gold: #ffd700;
+            --neon-red: #ff003c;
+            --glass-bg: rgba(20, 20, 30, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #8a8a8a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body {
+            background-color: var(--bg-deep);
+            background-image: radial-gradient(circle at 50% 0%, #1a1a2e 0%, #000 80%);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 80px; /* Space for scrolling */
+        }
+
+        /* Star Background */
+        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.4; animation: twinkle 4s infinite; }
+        @keyframes twinkle { 50% { opacity: 1; transform: scale(1.5); } }
+
+        /* --- HEADER PROFILE --- */
+        .header {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+
+        .profile-info { display: flex; align-items: center; gap: 15px; }
+
+        .avatar-box {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+
+        .avatar-img {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--neon-blue);
+            background: #000;
+            object-fit: cover;
+            padding: 2px;
+        }
+
+        .status-dot {
+            position: absolute; bottom: 2px; right: 2px;
+            width: 12px; height: 12px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            border: 2px solid #000;
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .user-text h3 { font-family: 'Rajdhani', sans-serif; font-size: 1.2rem; text-transform: uppercase; line-height: 1; }
+        .user-text p { font-size: 0.8rem; color: var(--text-muted); font-family: monospace; }
+        .user-text span { color: var(--neon-blue); }
+
+        .settings-icon { font-size: 1.5rem; color: #fff; cursor: pointer; transition: 0.3s; }
+        .settings-icon:hover { color: var(--neon-blue); transform: rotate(90deg); }
+
+        /* --- STATS CARD --- */
+        .stats-container {
+            margin: 20px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.4) 100%);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-container::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(0,240,255,0.1) 0%, transparent 70%);
+            animation: pulse 5s infinite;
+        }
+
+        .stat-item { position: relative; z-index: 2; }
+        .stat-label { font-size: 0.8rem; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
+        .stat-value { font-family: 'Rajdhani', sans-serif; font-size: 2rem; font-weight: 700; color: #fff; }
+        .stat-value.green { color: var(--neon-green); text-shadow: 0 0 15px rgba(0, 255, 136, 0.3); }
+        .stat-value.gold { color: var(--neon-gold); text-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
+
+        /* --- REFERRAL SECTION --- */
+        .referral-box {
+            margin: 0 20px 20px 20px;
+            background: #0a0a10;
+            border: 1px dashed var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ref-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--neon-blue);
+            font-family: monospace;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .btn-copy {
+            background: var(--neon-blue);
+            color: #000;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-copy:hover { box-shadow: 0 0 10px var(--neon-blue); }
+
+        /* --- MENU GRID --- */
+        .grid-menu {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 0 20px;
+        }
+
+        .menu-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 120px;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-card i { font-size: 2rem; margin-bottom: 10px; transition: 0.3s; }
+        .menu-card span { font-family: 'Rajdhani', sans-serif; font-weight: 600; letter-spacing: 1px; font-size: 1rem; }
+
+        /* Specific Colors for Cards */
+        .card-unlimited { border-bottom: 3px solid var(--neon-gold); }
+        .card-unlimited i { color: var(--neon-gold); }
+        .card-unlimited:hover { box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2); }
+
+        .card-4x { border-bottom: 3px solid var(--neon-blue); }
+        .card-4x i { color: var(--neon-blue); }
+        .card-4x:hover { box-shadow: 0 10px 30px rgba(0, 240, 255, 0.2); }
+
+        .card-8x { border-bottom: 3px solid var(--neon-purple); }
+        .card-8x i { color: var(--neon-purple); }
+        .card-8x:hover { box-shadow: 0 10px 30px rgba(188, 19, 254, 0.2); }
+
+        .card-withdraw { border-bottom: 3px solid var(--neon-red); }
+        .card-withdraw i { color: var(--neon-red); }
+        .card-withdraw:hover { box-shadow: 0 10px 30px rgba(255, 0, 60, 0.2); }
+
+        .logout-btn {
+            margin: 30px 20px;
+            padding: 15px;
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid var(--neon-red);
+            color: var(--neon-red);
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            display: block;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .logout-btn:hover { background: var(--neon-red); color: #fff; box-shadow: 0 0 20px var(--neon-red); }
+
+        /* Loading Skeleton */
+        .skeleton { color: transparent; background: rgba(255,255,255,0.1); border-radius: 4px; animation: pulse 1.5s infinite; }
+        
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
+    </style>
+</head>
+<body>
+
+    <!-- Star Background -->
+    <div class="stars" id="starContainer"></div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="profile-info">
+            <div class="avatar-box">
+                <!-- Using a robot avatar API for Sci-Fi look -->
+                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=ArtUser" class="avatar-img" id="userAvatar">
+                <div class="status-dot"></div>
+            </div>
+            <div class="user-text">
+                <h3 id="uName" class="skeleton">LOADING...</h3>
+                <p>ID: <span id="uID">...</span></p>
+            </div>
+        </div>
+        <a href="setting.html"><i class="fas fa-cog settings-icon"></i></a>
+    </div>
+
+    <!-- Stats Dashboard -->
+    <div class="stats-container">
+        <div class="stat-item">
+            <div class="stat-label">Total Earning</div>
+            <div class="stat-value gold">$<span id="uEarn">0.00</span></div>
+        </div>
+        <div class="stat-item" style="text-align: right;">
+            <div class="stat-label">Current Balance</div>
+            <div class="stat-value green">$<span id="uBal">0.00</span></div>
+        </div>
+    </div>
+
+    <!-- Referral Link -->
+    <div class="referral-box">
+        <i class="fas fa-link" style="color:#888;"></i>
+        <input type="text" id="refLink" class="ref-input" value="Loading Link..." readonly>
+        <button class="btn-copy" onclick="copyLink()">COPY</button>
+    </div>
+
+    <!-- Menu Grid -->
+    <div class="grid-menu">
+        <a href="unlimited_program.html" class="menu-card card-unlimited">
+            <i class="fas fa-infinity"></i>
+            <span>UNLIMITED</span>
+        </a>
+
+        <a href="4X_program.html" class="menu-card card-4x">
+            <i class="fas fa-th-large"></i>
+            <span>4X PROGRAM</span>
+        </a>
+
+        <a href="8X_program.html" class="menu-card card-8x">
+            <i class="fas fa-border-all"></i>
+            <span>8X PROGRAM</span>
+        </a>
+
+        <a href="withdrawal.html" class="menu-card card-withdraw">
+            <i class="fas fa-wallet"></i>
+            <span>WITHDRAW</span>
+        </a>
+    </div>
+
+    <!-- Logout -->
+    <div onclick="logout()" class="logout-btn">
+        <i class="fas fa-power-off"></i> LOGOUT SYSTEM
+    </div>
+
+
+    <!-- JS LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+        // 1. Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDaEHhCD5qym29F8HbXLqrrQ3OpaAP8VVE",
+            authDomain: "artifical-a9b7c.firebaseapp.com",
+            databaseURL: "https://artifical-a9b7c-default-rtdb.firebaseio.com",
+            projectId: "artifical-a9b7c",
+            storageBucket: "artifical-a9b7c.firebasestorage.app",
+            messagingSenderId: "525755884258",
+            appId: "1:525755884258:web:c5619c23fc7be196ea74bb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // 2. Stars Animation
+        const starContainer = document.getElementById('starContainer');
+        for(let i=0; i<60; i++){
+            let star = document.createElement('div');
+            star.className = 'star';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.width = Math.random() * 3 + 'px';
+            star.style.height = star.style.width;
+            star.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            starContainer.appendChild(star);
+        }
+
+        // 3. User Logic
+        const currentUser = sessionStorage.getItem('currentUser');
+
+        // Security Check
+        if(!currentUser) {
+            window.location.href = 'login.html';
+        }
+
+        // Fetch Data
+        const dbRef = ref(db);
+        get(child(dbRef, `users/${currentUser}`)).then((snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                
+                // Update UI
+                document.getElementById('uName').innerText = data.name;
+                document.getElementById('uName').classList.remove('skeleton');
+                
+                document.getElementById('uID').innerText = currentUser;
+                
+                document.getElementById('uBal').innerText = (data.balance || 0).toFixed(2);
+                document.getElementById('uEarn').innerText = (data.totalEarning || 0).toFixed(2);
+
+                // Generate Referral Link
+                const baseUrl = window.location.href.replace('home.html', 'registration_account_active.html');
+                const finalLink = `${baseUrl}?ref=${data.referralCode}`;
+                document.getElementById('refLink').value = finalLink;
+
+                // Update Avatar based on name seed
+                document.getElementById('userAvatar').src = `https://api.dicebear.com/7.x/bottts/svg?seed=${data.name}`;
+
+            } else {
+                alert("Session Expired. Please Login Again.");
+                window.location.href = 'login.html';
+            }
+        }).catch((error) => {
+            console.error(error);
+        });
+
+        // 4. Copy Function
+        window.copyLink = () => {
+            const copyText = document.getElementById("refLink");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); // Mobile
+            navigator.clipboard.writeText(copyText.value);
+            
+            const btn = document.querySelector('.btn-copy');
+            btn.innerText = "COPIED!";
+            btn.style.background = "#00ff88";
+            setTimeout(() => {
+                btn.innerText = "COPY";
+                btn.style.background = "#00f0ff";
+            }, 2000);
+        };
+
+        // 5. Logout Function
+        window.logout = () => {
+            if(confirm("Terminate Session?")) {
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+            }
+        };
+    </script>
+</body>
+</html>
