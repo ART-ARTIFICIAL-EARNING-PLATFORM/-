@@ -56,13 +56,13 @@
         <a href="task.html" class="menu-btn" id="taskBtn">
             <i class="fas fa-tasks"></i><br>Daily Tasks
         </a>
-        <a href="#" class="menu-btn locked" id="refBtn">
+        <a href="referral.html" class="menu-btn locked" id="refBtn">
             <i class="fas fa-users"></i><br>Referral
         </a>
-        <a href="#" class="menu-btn locked" id="weeklyBtn">
+        <a href="monthly_weekly.html" class="menu-btn locked" id="weeklyBtn">
             <i class="fas fa-calendar-alt"></i><br>Monthly/Weekly
         </a>
-        <a href="#" class="menu-btn locked" id="withdrawBtn">
+        <a href="withdraw.html" class="menu-btn locked" id="withdrawBtn">
             <i class="fas fa-wallet"></i><br>Withdraw
         </a>
     </div>
@@ -73,8 +73,12 @@
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFUjw5Lc6ZXzN6JTkRvIylYiym_jmsOv4",
+            authDomain: "tk65-58e25.firebaseapp.com",
             databaseURL: "https://tk65-58e25-default-rtdb.firebaseio.com",
-            projectId: "tk65-58e25"
+            projectId: "tk65-58e25",
+            storageBucket: "tk65-58e25.firebasestorage.app",
+            messagingSenderId: "448634734164",
+            appId: "1:448634734164:web:6dde19cf3e77f6a5fb0fc1"
         };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
@@ -89,8 +93,8 @@
             if(data) {
                 document.getElementById('uName').innerText = data.name;
                 document.getElementById('coins').innerText = data.balance;
-                document.getElementById('taka').innerText = ((data.balance / 1000) * 17).toFixed(2); // 1000 coin = 17 tk
-                document.getElementById('refCount').innerText = data.activeRefs;
+                document.getElementById('taka').innerText = ((data.balance / 1000) * 17).toFixed(2);
+                document.getElementById('refCount').innerText = data.activeRefs || 0;
                 
                 let statusEl = document.getElementById('accStatus');
                 let tasksDone = data.tasksCompleted || 0;
@@ -113,26 +117,29 @@
 
                 // Unlock Logic
                 if(currentLevel >= 1) {
-                    unlockBtn('refBtn', 'referral.html');
-                    unlockBtn('withdrawBtn', 'withdraw.html');
+                    unlockBtn('refBtn');
+                    unlockBtn('withdrawBtn');
                 }
+                
+                // Monthly/Weekly unlock at Level 2 (as per your first instruction)
                 if(currentLevel >= 2) {
-                    unlockBtn('weeklyBtn', 'monthly_weekly.html');
+                    unlockBtn('weeklyBtn');
                 }
             }
         });
 
-        function unlockBtn(id, link) {
+        function unlockBtn(id) {
             let btn = document.getElementById(id);
-            btn.classList.remove('locked');
-            btn.href = link;
+            if(btn) btn.classList.remove('locked');
         }
 
-        // Prevent clicking locked buttons
-        document.querySelectorAll('.locked').forEach(btn => {
+        // বাগ ফিক্স: ডায়নামিকভাবে চেক করবে বাটনটা লক কিনা!
+        document.querySelectorAll('.menu-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                alert("This feature is currently locked! Check Level requirements.");
+                if(btn.classList.contains('locked')) {
+                    e.preventDefault();
+                    alert("This feature is currently locked! Check Level requirements.");
+                }
             });
         });
     </script>
