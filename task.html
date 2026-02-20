@@ -10,18 +10,30 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background: #0f172a; color: white; padding: 20px; }
         .header { text-align: center; margin-bottom: 20px; }
+        .stats-bar { display: flex; justify-content: space-around; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; margin-bottom: 15px; font-size: 14px; }
+        .stats-bar span { font-weight: bold; }
+        .text-green { color: #10b981; } .text-red { color: #ef4444; } .text-yellow { color: #f59e0b; }
         .glass-card { background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 20px; }
         button { width: 100%; padding: 15px; background: linear-gradient(90deg, #3b82f6, #10b981); border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:disabled { background: #555; cursor: not-allowed; }
         .copy-group { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 10px; }
         .copy-btn { background: #3b82f6; padding: 5px 10px; border-radius: 5px; cursor: pointer; border: none; color: white; width: auto;}
         input { width: 100%; padding: 12px; margin-bottom: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; }
         #taskDetails, #submitSection { display: none; }
+        #timerBox { text-align: center; font-size: 20px; font-weight: bold; color: #ef4444; margin-bottom: 15px; }
     </style>
 </head>
 <body>
     <div class="header">
         <h2><i class="fas fa-tasks"></i> Gmail Task</h2>
         <a href="dashboard.html" style="color: #10b981; text-decoration: none;"><i class="fas fa-arrow-left"></i> Back</a>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+        <span class="text-green">Success: <span id="successCount">0</span></span>
+        <span class="text-red">Failed: <span id="failCount">0</span></span>
+        <span class="text-yellow">Pending: <span id="pendingCount">0</span></span>
     </div>
 
     <div class="glass-card" id="applySection">
@@ -31,6 +43,7 @@
     </div>
 
     <div class="glass-card" id="taskDetails">
+        <div id="timerBox"><i class="fas fa-clock"></i> Time Left: <span id="timerDisplay">13:00</span></div>
         <h3 style="color:#10b981; margin-bottom:15px;">Admin Sent Details:</h3>
         <div id="dataFields"></div>
     </div>
@@ -44,23 +57,40 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+        import { getDatabase, ref, set, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
         const app = initializeApp({
             databaseURL: "https://tk65-58e25-default-rtdb.firebaseio.com",
             projectId: "tk65-58e25"
         });
         const db = getDatabase(app);
-        const uid = localStorage.getItem("uid");
+        const uid = localStorage.getItem("uid"); // Make sure this is set on login
 
         if(!uid) window.location.href = "login.html";
 
         const taskRef = ref(db, 'tasks/' + uid);
+        const userRef = ref(db, 'users/' + uid);
 
-        // Fetch User Name
         let userName = "User";
-        onValue(ref(db, 'users/' + uid), (snap) => { if(snap.exists()) userName = snap.val().name; });
+        let userStats = { success: 0, fail: 0, pending: 0, lastSubmitTime: 0, banUntil: 0 };
+        let timerInterval;
 
+        // Fetch User Data & Stats
+        onValue(userRef, (snap) => { 
+            if(snap.exists()) {
+                let data = snap.val();
+                userName = data.name || "User";
+                userStats.success = data.successCount || 0;
+                userStats.fail = data.failCount || 0;
+                userStats.lastSubmitTime = data.lastSubmitTime || 0;
+                userStats.banUntil = data.banUntil || 0;
+
+                document.getElementById('successCount').innerText = userStats.success;
+                document.getElementById('failCount').innerText = userStats.fail;
+            } 
+        });
+
+        // Handle Task Updates
         onValue(taskRef, (snapshot) => {
             const data = snapshot.val();
             let statusMsg = document.getElementById('statusMsg');
@@ -69,39 +99,91 @@
             let taskDetails = document.getElementById('taskDetails');
             let submitSec = document.getElementById('submitSection');
 
+            clearInterval(timerInterval); // Stop previous timers
+
             if(!data) {
+                applySec.style.display = 'block';
                 applyBtn.style.display = 'block';
-                statusMsg.innerText = "";
+                taskDetails.style.display = 'none';
+                submitSec.style.display = 'none';
+                document.getElementById('pendingCount').innerText = "0";
+
+                // Check Cooldown and Ban
+                let now = Date.now();
+                if(userStats.banUntil > now) {
+                    applyBtn.disabled = true;
+                    statusMsg.innerText = `You are banned for ${Math.ceil((userStats.banUntil - now)/60000)} minutes.`;
+                } else if(now - userStats.lastSubmitTime < 60000) {
+                    applyBtn.disabled = true;
+                    let secLeft = 60 - Math.floor((now - userStats.lastSubmitTime)/1000);
+                    statusMsg.innerText = `Wait ${secLeft} seconds to apply again.`;
+                    setTimeout(() => statusMsg.innerText = "", secLeft * 1000);
+                    setTimeout(() => applyBtn.disabled = false, secLeft * 1000);
+                } else {
+                    applyBtn.disabled = false;
+                    statusMsg.innerText = "";
+                }
+
             } else if (data.status === "requested") {
                 applyBtn.style.display = 'none';
                 statusMsg.innerText = "Loading... Waiting for Admin to send task.";
+                document.getElementById('pendingCount').innerText = "1";
             } else if (data.status === "assigned") {
                 applySec.style.display = 'none';
                 taskDetails.style.display = 'block';
                 submitSec.style.display = 'block';
+                document.getElementById('pendingCount').innerText = "1";
                 
+                // Fields display
                 let fieldsHTML = "";
                 for(let key in data.adminData) {
                     if(data.adminData[key]) {
                         fieldsHTML += `
                         <div class="copy-group">
-                            <span><b>${key}:</b> <span id="${key}">${data.adminData[key]}</span></span>
-                            <button class="copy-btn" onclick="copyText('${key}')"><i class="fas fa-copy"></i></button>
+                            <span><b>${key}:</b> <span id="${key.replace(/\s/g, '')}">${data.adminData[key]}</span></span>
+                            <button class="copy-btn" onclick="copyText('${key.replace(/\s/g, '')}')"><i class="fas fa-copy"></i></button>
                         </div>`;
                     }
                 }
                 document.getElementById('dataFields').innerHTML = fieldsHTML;
+
+                // 13 Minute Timer Logic
+                startTimer(data.assignTime);
+
             } else if (data.status === "submitted") {
                 applySec.style.display = 'block';
                 applyBtn.style.display = 'none';
                 taskDetails.style.display = 'none';
                 submitSec.style.display = 'none';
+                document.getElementById('pendingCount').innerText = "1";
                 statusMsg.innerText = "Task submitted! Admin is reviewing.";
             }
         });
 
+        function startTimer(assignTime) {
+            let maxTime = 13 * 60 * 1000; // 13 minutes
+            let display = document.getElementById('timerDisplay');
+
+            timerInterval = setInterval(() => {
+                let passed = Date.now() - assignTime;
+                let left = maxTime - passed;
+
+                if (left <= 0) {
+                    clearInterval(timerInterval);
+                    alert("Time is up! Task Missed.");
+                    // Mark as Failed
+                    update(userRef, { failCount: userStats.fail + 1 });
+                    remove(taskRef); // Delete task so user can apply again
+                } else {
+                    let m = Math.floor(left / 60000);
+                    let s = Math.floor((left % 60000) / 1000);
+                    display.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+                }
+            }, 1000);
+        }
+
         document.getElementById('applyBtn').addEventListener('click', () => {
-            set(taskRef, { status: "requested", userName: userName, timestamp: Date.now() });
+            set(taskRef, { status: "requested", userName: userName, requestTime: Date.now() });
         });
 
         document.getElementById('submitTaskBtn').addEventListener('click', () => {
@@ -113,13 +195,16 @@
                 status: "submitted",
                 userData: { email: email, password: pass }
             });
-            alert("Submitted Successfully!");
+            // Update last submit time for 1 minute cooldown
+            update(userRef, { lastSubmitTime: Date.now() });
+            
+            document.getElementById('createdEmail').value = "";
+            document.getElementById('createdPass').value = "";
         });
 
         window.copyText = function(id) {
             let text = document.getElementById(id).innerText;
             navigator.clipboard.writeText(text);
-            alert("Copied: " + text);
         }
     </script>
 </body>
