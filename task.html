@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Task</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: #0f172a; color: white; padding: 20px; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .glass-card { background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 20px; }
+        button { width: 100%; padding: 15px; background: linear-gradient(90deg, #3b82f6, #10b981); border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .copy-group { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+        .copy-btn { background: #3b82f6; padding: 5px 10px; border-radius: 5px; cursor: pointer; border: none; color: white; width: auto;}
+        input { width: 100%; padding: 12px; margin-bottom: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; }
+        #taskDetails, #submitSection { display: none; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2><i class="fas fa-tasks"></i> Gmail Task</h2>
+        <a href="dashboard.html" style="color: #10b981; text-decoration: none;"><i class="fas fa-arrow-left"></i> Back</a>
+    </div>
+
+    <div class="glass-card" id="applySection">
+        <h3 style="text-align:center;">Apply for Task</h3>
+        <button id="applyBtn">Apply Now</button>
+        <p id="statusMsg" style="text-align:center; color:#f59e0b; margin-top:10px;"></p>
+    </div>
+
+    <div class="glass-card" id="taskDetails">
+        <h3 style="color:#10b981; margin-bottom:15px;">Admin Sent Details:</h3>
+        <div id="dataFields"></div>
+    </div>
+
+    <div class="glass-card" id="submitSection">
+        <h3>Submit Completed Task</h3>
+        <input type="email" id="createdEmail" placeholder="Created Gmail Address">
+        <input type="text" id="createdPass" placeholder="Gmail Password">
+        <button id="submitTaskBtn" style="background: #10b981;">Submit to Admin</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        const app = initializeApp({
+            databaseURL: "https://tk65-58e25-default-rtdb.firebaseio.com",
+            projectId: "tk65-58e25"
+        });
+        const db = getDatabase(app);
+        const uid = localStorage.getItem("uid");
+
+        if(!uid) window.location.href = "login.html";
+
+        const taskRef = ref(db, 'tasks/' + uid);
+
+        // Fetch User Name
+        let userName = "User";
+        onValue(ref(db, 'users/' + uid), (snap) => { if(snap.exists()) userName = snap.val().name; });
+
+        onValue(taskRef, (snapshot) => {
+            const data = snapshot.val();
+            let statusMsg = document.getElementById('statusMsg');
+            let applyBtn = document.getElementById('applyBtn');
+            let applySec = document.getElementById('applySection');
+            let taskDetails = document.getElementById('taskDetails');
+            let submitSec = document.getElementById('submitSection');
+
+            if(!data) {
+                applyBtn.style.display = 'block';
+                statusMsg.innerText = "";
+            } else if (data.status === "requested") {
+                applyBtn.style.display = 'none';
+                statusMsg.innerText = "Loading... Waiting for Admin to send task.";
+            } else if (data.status === "assigned") {
+                applySec.style.display = 'none';
+                taskDetails.style.display = 'block';
+                submitSec.style.display = 'block';
+                
+                let fieldsHTML = "";
+                for(let key in data.adminData) {
+                    if(data.adminData[key]) {
+                        fieldsHTML += `
+                        <div class="copy-group">
+                            <span><b>${key}:</b> <span id="${key}">${data.adminData[key]}</span></span>
+                            <button class="copy-btn" onclick="copyText('${key}')"><i class="fas fa-copy"></i></button>
+                        </div>`;
+                    }
+                }
+                document.getElementById('dataFields').innerHTML = fieldsHTML;
+            } else if (data.status === "submitted") {
+                applySec.style.display = 'block';
+                applyBtn.style.display = 'none';
+                taskDetails.style.display = 'none';
+                submitSec.style.display = 'none';
+                statusMsg.innerText = "Task submitted! Admin is reviewing.";
+            }
+        });
+
+        document.getElementById('applyBtn').addEventListener('click', () => {
+            set(taskRef, { status: "requested", userName: userName, timestamp: Date.now() });
+        });
+
+        document.getElementById('submitTaskBtn').addEventListener('click', () => {
+            let email = document.getElementById('createdEmail').value;
+            let pass = document.getElementById('createdPass').value;
+            if(!email || !pass) return alert("Enter both Email and Password!");
+            
+            update(taskRef, {
+                status: "submitted",
+                userData: { email: email, password: pass }
+            });
+            alert("Submitted Successfully!");
+        });
+
+        window.copyText = function(id) {
+            let text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text);
+            alert("Copied: " + text);
+        }
+    </script>
+</body>
+</html>
