@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: #0f172a; color: white; padding-bottom: 20px; }
+        header { background: rgba(255,255,255,0.05); padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .status-badge { padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 14px; }
+        .unactive { background: #ef4444; } .active { background: #10b981; }
+        .balance-card { margin: 20px; padding: 20px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 15px; text-align: center; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+        .balance-card h3 { font-size: 30px; }
+        .taka { font-size: 14px; color: #e2e8f0; }
+        
+        .stats { display: flex; justify-content: space-between; margin: 0 20px; gap: 10px; }
+        .stat-box { flex: 1; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
+        .menu-btn { padding: 20px; background: rgba(255,255,255,0.05); border-radius: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: 0.3s; color: white; text-decoration: none; position: relative; }
+        .menu-btn i { font-size: 30px; margin-bottom: 10px; color: #10b981; }
+        .menu-btn.locked { opacity: 0.5; cursor: not-allowed; }
+        .menu-btn.locked::after { content: "\f023"; font-family: "FontAwesome"; position: absolute; top: 10px; right: 10px; color: #ef4444; }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <h4><i class="fas fa-user"></i> <span id="uName">Loading...</span></h4>
+            <small>UID: <span id="uId">...</span></small>
+        </div>
+        <div class="status-badge unactive" id="accStatus">Unactive</div>
+    </header>
+
+    <div class="balance-card">
+        <p>Total Balance</p>
+        <h3><i class="fas fa-coins"></i> <span id="coins">0</span></h3>
+        <p class="taka">≈ ৳ <span id="taka">0.00</span></p>
+    </div>
+
+    <div class="stats">
+        <div class="stat-box">
+            <p>Level</p>
+            <h3 id="uLevel" style="color:#f59e0b;">0</h3>
+        </div>
+        <div class="stat-box">
+            <p>Active Refs</p>
+            <h3 id="refCount" style="color:#3b82f6;">0</h3>
+        </div>
+    </div>
+
+    <div class="menu-grid">
+        <a href="task.html" class="menu-btn" id="taskBtn">
+            <i class="fas fa-tasks"></i><br>Daily Tasks
+        </a>
+        <a href="#" class="menu-btn locked" id="refBtn">
+            <i class="fas fa-users"></i><br>Referral
+        </a>
+        <a href="#" class="menu-btn locked" id="weeklyBtn">
+            <i class="fas fa-calendar-alt"></i><br>Monthly/Weekly
+        </a>
+        <a href="#" class="menu-btn locked" id="withdrawBtn">
+            <i class="fas fa-wallet"></i><br>Withdraw
+        </a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFUjw5Lc6ZXzN6JTkRvIylYiym_jmsOv4",
+            databaseURL: "https://tk65-58e25-default-rtdb.firebaseio.com",
+            projectId: "tk65-58e25"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const uid = localStorage.getItem("uid");
+        if(!uid) window.location.href = "login.html";
+
+        document.getElementById('uId').innerText = uid.substring(0, 8).toUpperCase();
+
+        onValue(ref(db, 'users/' + uid), (snapshot) => {
+            const data = snapshot.val();
+            if(data) {
+                document.getElementById('uName').innerText = data.name;
+                document.getElementById('coins').innerText = data.balance;
+                document.getElementById('taka').innerText = ((data.balance / 1000) * 17).toFixed(2); // 1000 coin = 17 tk
+                document.getElementById('refCount').innerText = data.activeRefs;
+                
+                let statusEl = document.getElementById('accStatus');
+                let tasksDone = data.tasksCompleted || 0;
+                let activeRefs = data.activeRefs || 0;
+                let currentLevel = 0;
+
+                // Level Logic
+                if(tasksDone >= 2) {
+                    statusEl.innerText = "Active";
+                    statusEl.className = "status-badge active";
+                    currentLevel = 1;
+                    if(activeRefs >= 10) currentLevel = 2;
+                    if(activeRefs >= 20) currentLevel = 3;
+                    if(activeRefs >= 40) currentLevel = 4;
+                    
+                    update(ref(db, 'users/' + uid), { status: "Active", level: currentLevel });
+                }
+
+                document.getElementById('uLevel').innerText = currentLevel;
+
+                // Unlock Logic
+                if(currentLevel >= 1) {
+                    unlockBtn('refBtn', 'referral.html');
+                    unlockBtn('withdrawBtn', 'withdraw.html');
+                }
+                if(currentLevel >= 2) {
+                    unlockBtn('weeklyBtn', 'monthly_weekly.html');
+                }
+            }
+        });
+
+        function unlockBtn(id, link) {
+            let btn = document.getElementById(id);
+            btn.classList.remove('locked');
+            btn.href = link;
+        }
+
+        // Prevent clicking locked buttons
+        document.querySelectorAll('.locked').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                alert("This feature is currently locked! Check Level requirements.");
+            });
+        });
+    </script>
+</body>
+</html>
