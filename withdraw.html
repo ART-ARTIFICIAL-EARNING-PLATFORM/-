@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdraw</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: #0f172a; color: white; padding: 20px; }
+        .card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        select, input { width: 100%; padding: 15px; margin-top: 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; outline:none;}
+        button { width: 100%; padding: 15px; background: #10b981; border: none; border-radius: 8px; color: white; font-weight: bold; margin-top: 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2 style="text-align:center; color:#10b981;">Withdraw Funds</h2>
+        <p style="text-align:center; margin-top:10px;">Available: <span id="myBal">0</span> Coins</p>
+        
+        <select id="method">
+            <option value="bKash">bKash</option>
+            <option value="Nagad">Nagad</option>
+        </select>
+        <input type="number" id="accountNo" placeholder="Account Number">
+        <input type="number" id="amount" placeholder="Amount (in Coins)">
+        
+        <button id="reqBtn">Request Withdraw</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        const app = initializeApp({ databaseURL: "https://tk65-58e25-default-rtdb.firebaseio.com", projectId: "tk65-58e25" });
+        const db = getDatabase(app);
+        const uid = localStorage.getItem("uid");
+        let balance = 0;
+
+        get(ref(db, 'users/' + uid)).then(snap => {
+            if(snap.exists()) {
+                balance = snap.val().balance;
+                document.getElementById('myBal').innerText = balance;
+            }
+        });
+
+        document.getElementById('reqBtn').addEventListener('click', async () => {
+            let method = document.getElementById('method').value;
+            let acc = document.getElementById('accountNo').value;
+            let amt = parseInt(document.getElementById('amount').value);
+
+            // Assuming Admin limit is 5000 coins (You can fetch this from DB)
+            if(!acc || !amt) return alert("Fill all details!");
+            if(amt < 5000) return alert("Minimum withdraw limit is 5000 Coins!");
+            if(amt > balance) return alert("Insufficient Balance!");
+
+            // Deduct balance and send request
+            await update(ref(db, 'users/' + uid), { balance: balance - amt });
+            await set(ref(db, 'withdrawals/' + Date.now()), {
+                uid: uid,
+                method: method,
+                account: acc,
+                amount: amt,
+                status: "Pending",
+                time: new Date().toLocaleString()
+            });
+
+            alert("Withdraw request sent successfully!");
+            window.location.reload();
+        });
+    </script>
+</body>
+</html>
