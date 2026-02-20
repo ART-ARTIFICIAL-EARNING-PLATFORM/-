@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referral System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: #0f172a; color: white; padding: 20px; }
+        .card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); text-align: center; margin-bottom: 20px;}
+        .code-box { background: rgba(0,0,0,0.4); padding: 15px; font-size: 24px; font-weight: bold; letter-spacing: 2px; color: #10b981; border-radius: 10px; margin: 15px 0; }
+        .stats { display: flex; justify-content: space-around; }
+        .stats h3 { color: #3b82f6; }
+        button { padding: 10px 20px; background: #3b82f6; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; }
+        .ref-list { margin-top: 20px; text-align: left;}
+        .ref-item { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between;}
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Your Referral Code</h2>
+        <div class="code-box" id="myCode">Loading...</div>
+        <button onclick="copyLink()">Copy Invite Link</button>
+    </div>
+
+    <div class="card stats">
+        <div><p>Total Referrad</p><h3 id="totRef">0</h3></div>
+        <div><p>Active Referrad</p><h3 id="actRef" style="color:#10b981;">0</h3></div>
+    </div>
+
+    <div class="card ref-list">
+        <h3>My Network</h3>
+        <div id="networkList" style="margin-top:10px;"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        const app = initializeApp({ databaseURL: "https://tk65-58e25-default-rtdb.firebaseio.com", projectId: "tk65-58e25" });
+        const db = getDatabase(app);
+        const uid = localStorage.getItem("uid");
+        let myCode = "";
+
+        // Get My Code
+        onValue(ref(db, 'users/' + uid), (snap) => {
+            myCode = snap.val().myRefCode;
+            document.getElementById('myCode').innerText = myCode;
+        });
+
+        // Scan all users to find downlines
+        onValue(ref(db, 'users'), (snapshot) => {
+            let total = 0; let active = 0; let html = "";
+            snapshot.forEach((child) => {
+                let u = child.val();
+                if(u.referredBy === myCode && myCode !== "") {
+                    total++;
+                    let isActive = (u.status === "Active");
+                    if(isActive) active++;
+                    
+                    let col = isActive ? "#10b981" : "#ef4444";
+                    html += `<div class="ref-item">
+                                <span><i class="fas fa-user"></i> ${u.name}</span>
+                                <span style="color:${col}">${u.status}</span>
+                             </div>`;
+                }
+            });
+            document.getElementById('totRef').innerText = total;
+            document.getElementById('actRef').innerText = active;
+            document.getElementById('networkList').innerHTML = html || "<p style='text-align:center; color:#888;'>No referrals yet.</p>";
+            
+            // Auto update activeRef count in user profile
+            update(ref(db, 'users/' + uid), { activeRefs: active });
+        });
+
+        window.copyLink = function() {
+            let link = window.location.origin + "/register.html?ref=" + myCode;
+            navigator.clipboard.writeText(link);
+            alert("Invite Link Copied!");
+        }
+    </script>
+</body>
+</html>
