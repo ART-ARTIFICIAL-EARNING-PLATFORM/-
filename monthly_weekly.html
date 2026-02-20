@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Targets</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: #0f172a; color: white; padding: 20px; }
+        .card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
+        .btn { width: 100%; padding: 12px; background: #3b82f6; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-green { background: #10b981; }
+        .progress-text { color: #f59e0b; font-weight: bold; margin-top: 10px; text-align: center;}
+    </style>
+</head>
+<body>
+    <h2 style="text-align:center; color:#10b981; margin-bottom: 20px;">Available Targets</h2>
+    
+    <div id="myStatus" class="card" style="display:none; border-color: #f59e0b;"></div>
+    <div id="targetList"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, onValue, set, get, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        const app = initializeApp({ databaseURL: "https://tk65-58e25-default-rtdb.firebaseio.com" });
+        const db = getDatabase(app);
+        const uid = localStorage.getItem("uid");
+        if(!uid) window.location.href = "login.html";
+
+        let myActiveRefs = 0;
+        let userName = "";
+        
+        // Fetch user data
+        get(ref(db, 'users/' + uid)).then(snap => {
+            if(snap.exists()) {
+                myActiveRefs = snap.val().activeRefs || 0;
+                userName = snap.val().name;
+            }
+        });
+
+        // Check user's current target status
+        onValue(ref(db, 'target_requests/' + uid), (snapshot) => {
+            let statusDiv = document.getElementById('myStatus');
+            let listDiv = document.getElementById('targetList');
+            let data = snapshot.val();
+
+            if(!data) {
+                statusDiv.style.display = 'none';
+                listDiv.style.display = 'block';
+                loadTargets();
+            } else {
+                listDiv.style.display = 'none';
+                statusDiv.style.display = 'block';
+
+                if(data.status === "Pending Approval") {
+                    statusDiv.innerHTML = `<h3 style="color:#3b82f6">Status: Pending</h3><p>Admin is reviewing your application for ${data.type} target.</p>`;
+                } 
+                else if(data.status === "Active") {
+                    let progress = myActiveRefs - data.initialRefs; // Calculate newly added refs
+                    let timeLeft = data.deadline - Date.now();
+                    let daysLeft = Math.ceil(timeLeft / (1000 * 60 * 60 * 24));
+
+                    if(timeLeft <= 0) {
+                        statusDiv.innerHTML = `<h3 style="color:#ef4444">Time Over!</h3><p>You failed to complete the target.</p><button class="btn" onclick="retryTarget()">Try Again</button>`;
+                    } else if(progress >= data.accRequired) {
+                        statusDiv.innerHTML = `<h3 style="color:#10b981">Target Completed!</h3><p>You have successfully activated ${progress} accounts.</p><button class="btn btn-green" onclick="requestPayment()">Apply for Payment</button>`;
+                    } else {
+                        statusDiv.innerHTML = `
+                            <h3>Active: ${data.type} Level ${data.level}</h3>
+                            <div class="progress-text">Progress: ${progress} / ${data.accRequired} Accounts</div>
+                            <p style="text-align:center; margin-top:5px; color:#ef4444;">Time Left: ${daysLeft} Days</p>
+                        `;
+                    }
+                }
+                else if(data.status === "Payment Requested") {
+                    statusDiv.innerHTML = `<h3 style="color:#10b981">Payment Requested!</h3><p>Admin is verifying your work. Please wait.</p>`;
+                }
+            }
+        });
+
+        function loadTargets() {
+            onValue(ref(db, 'targets'), (snapshot) => {
+                let html = "";
+                snapshot.forEach(child => {
+                    let d = child.val();
+                    html += `
+                    <div class="card">
+                        <h3 style="color:#3b82f6">${d.type} Target - Level ${d.level}</h3>
+                        <p>🎯 Goal: Activate <b>${d.accRequired}</b> Accounts</p>
+                        <p>⏳ Time: <b>${d.days}</b> Days</p>
+                        <p>💰 Reward: <b>${d.rewardCoins}</b> Coins</p>
+                        <button class="btn" onclick="applyTarget('${child.key}', '${d.type}', ${d.level}, ${d.days}, ${d.accRequired}, ${d.rewardCoins})">Apply Now</button>
+                    </div>`;
+                });
+                document.getElementById('targetList').innerHTML = html;
+            });
+        }
+
+        window.applyTarget = function(tid, type, level, days, accRequired, reward) {
+            set(ref(db, 'target_requests/' + uid), {
+                uid, userName, tid, type, level, days, accRequired, rewardCoins: reward,
+                status: "Pending Approval", timestamp: Date.now()
+            });
+            alert("Applied successfully! Waiting for Admin approval.");
+        }
+
+        window.requestPayment = function() {
+            update(ref(db, 'target_requests/' + uid), { status: "Payment Requested" });
+            alert("Payment request sent to admin!");
+        }
+
+        window.retryTarget = function() {
+            set(ref(db, 'target_requests/' + uid), null); // Delete failed request
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
