@@ -3,221 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ART ARTIFICIAL - Initializing...</title>
-    
-    <!-- FONTS -->
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-    
+    <title>GLOBAL X NETWORK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        /* --- PREMIUM CSS START --- */
-        :root {
-            --bg-color: #030305;
-            --neon-blue: #00f0ff;
-            --neon-purple: #bc13fe;
-            --text-color: #ffffff;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            background-image: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #000 100%);
-            color: var(--text-color);
-            font-family: 'Rajdhani', sans-serif;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* Star Background Animation */
-        .stars {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            pointer-events: none;
-            background: transparent;
-        }
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            opacity: 0.5;
-            animation: twinkle 4s infinite;
-        }
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.5); }
-        }
-
-        /* Loader Animation (Reactor Ring) */
-        .loader-container {
-            position: relative;
-            width: 150px;
-            height: 150px;
-            margin-bottom: 40px;
-        }
-
-        .ring {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 4px solid transparent;
-            border-top-color: var(--neon-blue);
-            animation: spin 2s linear infinite;
-            box-shadow: 0 0 15px var(--neon-blue);
-        }
-
-        .ring::before {
-            content: "";
-            position: absolute;
-            top: 10px; left: 10px; right: 10px; bottom: 10px;
-            border-radius: 50%;
-            border: 4px solid transparent;
-            border-top-color: var(--neon-purple);
-            animation: spin 3s linear infinite reverse;
-        }
-
-        .ring::after {
-            content: "";
-            position: absolute;
-            top: 25px; left: 25px; right: 25px; bottom: 25px;
-            border-radius: 50%;
-            border: 4px solid transparent;
-            border-top-color: #ffd700; /* Gold */
-            animation: spin 1.5s linear infinite;
-        }
-
-        .core {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 20px; height: 20px;
-            background: #fff;
-            border-radius: 50%;
-            box-shadow: 0 0 30px #fff, 0 0 60px var(--neon-blue);
-            animation: pulse 1s infinite alternate;
-        }
-
-        /* Text Styles */
-        h1 {
-            font-size: 2.5rem;
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-            text-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
-        }
-
-        p {
-            font-size: 1rem;
-            color: #888;
-            letter-spacing: 3px;
-            animation: blink 1.5s infinite;
-        }
-
-        /* Animations */
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        @keyframes pulse {
-            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.7; }
-            100% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-        }
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-        /* --- PREMIUM CSS END --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: #0f172a; height: 100vh; display: flex; justify-content: center; align-items: center; color: white; }
+        .loader-container { text-align: center; }
+        .logo { font-size: 30px; font-weight: 700; background: linear-gradient(90deg, #3b82f6, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; letter-spacing: 2px; }
+        .spinner { width: 50px; height: 50px; border: 5px solid rgba(255, 255, 255, 0.1); border-top-color: #10b981; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-
-    <!-- Star Background -->
-    <div class="stars" id="starContainer"></div>
-
-    <!-- Loader UI -->
     <div class="loader-container">
-        <div class="ring"></div>
-        <div class="core"></div>
+        <div class="logo">GLOBAL X NETWORK</div>
+        <div class="spinner"></div>
     </div>
-
-    <h1>ART ARTIFICIAL</h1>
-    <p id="statusText">INITIALIZING SYSTEM...</p>
-
-    <!-- FIREBASE LOGIC -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
-
-        // Your Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDaEHhCD5qym29F8HbXLqrrQ3OpaAP8VVE",
-            authDomain: "artifical-a9b7c.firebaseapp.com",
-            databaseURL: "https://artifical-a9b7c-default-rtdb.firebaseio.com",
-            projectId: "artifical-a9b7c",
-            storageBucket: "artifical-a9b7c.firebasestorage.app",
-            messagingSenderId: "525755884258",
-            appId: "1:525755884258:web:c5619c23fc7be196ea74bb"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        // Generate Background Stars
-        const starContainer = document.getElementById('starContainer');
-        for(let i=0; i<80; i++){
-            let star = document.createElement('div');
-            star.className = 'star';
-            star.style.top = Math.random() * 100 + '%';
-            star.style.left = Math.random() * 100 + '%';
-            star.style.width = Math.random() * 3 + 'px';
-            star.style.height = star.style.width;
-            star.style.animationDuration = (Math.random() * 3 + 2) + 's';
-            starContainer.appendChild(star);
-        }
-
-        // Logic: Check Maintenance & Redirect
-        setTimeout(() => {
-            const statusText = document.getElementById('statusText');
-            statusText.innerText = "CONNECTING TO SERVER...";
-
-            get(child(ref(db), 'adminSettings/maintenance')).then((snapshot) => {
-                if (snapshot.exists() && snapshot.val() === true) {
-                    // If Maintenance is ON
-                    document.body.innerHTML = `
-                        <h1 style="color:#ff003c; text-shadow:0 0 20px red;">SYSTEM OFFLINE</h1>
-                        <p style="color:white;">SERVER IS UNDER MAINTENANCE</p>
-                        <p style="color:#888; font-size:12px; margin-top:20px;">PLEASE TRY AGAIN LATER</p>
-                    `;
-                } else {
-                    // If Maintenance is OFF -> Go to Login
-                    statusText.innerText = "ACCESS GRANTED";
-                    statusText.style.color = "#00ff88";
-                    
-                    setTimeout(() => {
-                        window.location.href = "login.html";
-                    }, 800);
-                }
-            }).catch((error) => {
-                // In case of internet error, try to go to login anyway
-                console.error(error);
-                window.location.href = "login.html";
-            });
-
-        }, 2500); // 2.5 Seconds Loading Time
+    <script>
+        setTimeout(() => { window.location.href = "login.html"; }, 3000);
     </script>
 </body>
 </html>
