@@ -5,18 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Withdraw</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background: #0f172a; color: white; padding: 20px; }
-        .card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); }
-        select, input { width: 100%; padding: 15px; margin-top: 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; outline:none;}
-        button { width: 100%; padding: 15px; background: #10b981; border: none; border-radius: 8px; color: white; font-weight: bold; margin-top: 20px; cursor: pointer; }
+        .header { margin-bottom: 20px; }
+        .header a { color: #10b981; text-decoration: none; font-weight: bold; }
+        .card { background: rgba(255,255,255,0.05); padding: 30px 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); max-width: 500px; margin: 0 auto;}
+        select, input { width: 100%; padding: 15px; margin-top: 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; outline:none; font-size: 15px;}
+        button { width: 100%; padding: 15px; background: #10b981; border: none; border-radius: 8px; color: white; font-weight: bold; margin-top: 25px; cursor: pointer; font-size: 16px;}
+        .bal-box { text-align: center; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-top: 15px; }
     </style>
 </head>
 <body>
+    <div class="header">
+        <a href="dashboard.html"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    </div>
+
     <div class="card">
-        <h2 style="text-align:center; color:#10b981;">Withdraw Funds</h2>
-        <p style="text-align:center; margin-top:10px;">Available: <span id="myBal">0</span> Coins</p>
+        <h2 style="text-align:center; color:#10b981;"><i class="fas fa-wallet"></i> Withdraw Funds</h2>
+        
+        <div class="bal-box">
+            <p style="color: #aaa; font-size: 14px;">Available Balance</p>
+            <h2 style="color: #3b82f6;"><span id="myBal">0</span> Coins</h2>
+        </div>
         
         <select id="method">
             <option value="bKash">bKash</option>
@@ -25,7 +37,7 @@
         <input type="number" id="accountNo" placeholder="Account Number">
         <input type="number" id="amount" placeholder="Amount (in Coins)">
         
-        <button id="reqBtn"> Request Withdraw</button>
+        <button id="reqBtn">Request Withdraw</button>
     </div>
 
     <script type="module">
@@ -35,12 +47,20 @@
         const app = initializeApp({ databaseURL: "https://tk65-58e25-default-rtdb.firebaseio.com", projectId: "tk65-58e25" });
         const db = getDatabase(app);
         const uid = localStorage.getItem("uid");
-        let balance = 0;
+        
+        let taskBalance = 0;
+        let refBalance = 0;
+        let totalBalance = 0;
 
+        // Fetch Both Balances
         get(ref(db, 'users/' + uid)).then(snap => {
             if(snap.exists()) {
-                balance = snap.val().balance;
-                document.getElementById('myBal').innerText = balance;
+                let data = snap.val();
+                taskBalance = data.balance || 0;               // টাস্ক থেকে পাওয়া ব্যালেন্স
+                refBalance = data.referralEarnings || 0;       // রেফারেল থেকে পাওয়া ব্যালেন্স
+                totalBalance = taskBalance + refBalance;       // মোট ব্যালেন্স
+                
+                document.getElementById('myBal').innerText = totalBalance;
             }
         });
 
@@ -49,13 +69,30 @@
             let acc = document.getElementById('accountNo').value;
             let amt = parseInt(document.getElementById('amount').value);
 
-            // Assuming Admin limit is 5000 coins (You can fetch this from DB)
             if(!acc || !amt) return alert("Fill all details!");
             if(amt < 5000) return alert("Minimum withdraw limit is 5000 Coins!");
-            if(amt > balance) return alert("Insufficient Balance!");
+            if(amt > totalBalance) return alert("Insufficient Balance!");
+
+            // ড্যাশবোর্ড থেকে সঠিকভাবে কয়েন কাটার লজিক
+            let newTaskBal = taskBalance;
+            let newRefBal = refBalance;
+
+            if (amt <= taskBalance) {
+                // যদি শুধু টাস্কের ব্যালেন্স দিয়েই উইথড্র হয়ে যায়
+                newTaskBal -= amt;
+            } else {
+                // যদি টাস্কের ব্যালেন্স শেষ হয়ে যায়, তবে বাকিটা রেফারেল থেকে কাটবে
+                let remainingAmount = amt - taskBalance;
+                newTaskBal = 0;
+                newRefBal -= remainingAmount;
+            }
 
             // Deduct balance and send request
-            await update(ref(db, 'users/' + uid), { balance: balance - amt });
+            await update(ref(db, 'users/' + uid), { 
+                balance: newTaskBal,
+                referralEarnings: newRefBal
+            });
+
             await set(ref(db, 'withdrawals/' + Date.now()), {
                 uid: uid,
                 method: method,
