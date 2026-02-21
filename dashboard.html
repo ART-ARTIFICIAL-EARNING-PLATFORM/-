@@ -93,12 +93,10 @@
             if(data) {
                 document.getElementById('uName').innerText = data.name;
                 
-                // ==========================================
                 // ব্যালেন্স ক্যালকুলেশন ফিক্স (Task + Referral)
-                // ==========================================
-                let taskCoins = data.balance || 0;              // টাস্ক থেকে পাওয়া ব্যালেন্স
-                let referralCoins = data.referralEarnings || 0; // রেফারেল থেকে পাওয়া ব্যালেন্স
-                let totalCoins = taskCoins + referralCoins;     // মোট ব্যালেন্স
+                let taskCoins = data.balance || 0;              
+                let referralCoins = data.referralEarnings || 0; 
+                let totalCoins = taskCoins + referralCoins;     
 
                 document.getElementById('coins').innerText = totalCoins;
                 document.getElementById('taka').innerText = ((totalCoins / 1000) * 17).toFixed(2);
@@ -131,14 +129,11 @@
 
                 document.getElementById('uLevel').innerText = currentLevel;
 
-                // মেনু আনলক লজিক
+                // মেনু আনলক লজিক (সবগুলো এখন Level 1 তেই আনলক হবে)
                 if(currentLevel >= 1) {
                     unlockBtn('refBtn');
                     unlockBtn('withdrawBtn');
-                }
-                
-                if(currentLevel >= 2) {
-                    unlockBtn('weeklyBtn');
+                    unlockBtn('weeklyBtn'); // Monthly/Weekly এখন Level 1 এই আনলক হবে
                 }
             }
         });
