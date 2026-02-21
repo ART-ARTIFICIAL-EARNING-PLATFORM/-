@@ -15,6 +15,7 @@
         select, input { width: 100%; padding: 15px; margin-top: 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 8px; outline:none; font-size: 15px;}
         button { width: 100%; padding: 15px; background: #10b981; border: none; border-radius: 8px; color: white; font-weight: bold; margin-top: 25px; cursor: pointer; font-size: 16px;}
         .bal-box { text-align: center; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-top: 15px; }
+        .limit-text { text-align: center; color: #f59e0b; font-size: 14px; margin-top: 10px; font-weight: bold;}
     </style>
 </head>
 <body>
@@ -29,10 +30,14 @@
             <p style="color: #aaa; font-size: 14px;">Available Balance</p>
             <h2 style="color: #3b82f6;"><span id="myBal">0</span> Coins</h2>
         </div>
+
+        <!-- Dynamic Limit Display -->
+        <p class="limit-text"><i class="fas fa-info-circle"></i> Minimum Withdraw: <span id="minLimitText">Loading...</span> Coins</p>
         
         <select id="method">
             <option value="bKash">bKash</option>
             <option value="Nagad">Nagad</option>
+            <option value="Rocket">Rocket</option>
         </select>
         <input type="number" id="accountNo" placeholder="Account Number">
         <input type="number" id="amount" placeholder="Amount (in Coins)">
@@ -42,7 +47,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+        import { getDatabase, ref, get, set, update, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
         const app = initializeApp({ databaseURL: "https://tk65-58e25-default-rtdb.firebaseio.com", projectId: "tk65-58e25" });
         const db = getDatabase(app);
@@ -51,26 +56,41 @@
         let taskBalance = 0;
         let refBalance = 0;
         let totalBalance = 0;
+        let minWithdrawLimit = 5000; // ডিফল্ট লিমিট
 
-        // Fetch Both Balances
+        // ১. অ্যাডমিন প্যানেলের লিমিট ফায়ারবেস থেকে আনা হচ্ছে
+        onValue(ref(db, 'settings/withdrawLimit'), (snap) => {
+            if(snap.exists()) {
+                minWithdrawLimit = parseInt(snap.val());
+                document.getElementById('minLimitText').innerText = minWithdrawLimit;
+            } else {
+                document.getElementById('minLimitText').innerText = "5000"; // সেট করা না থাকলে ৫০০০ দেখাবে
+            }
+        });
+
+        // ২. ইউজারের টোটাল ব্যালেন্স আনা হচ্ছে
         get(ref(db, 'users/' + uid)).then(snap => {
             if(snap.exists()) {
                 let data = snap.val();
-                taskBalance = data.balance || 0;               // টাস্ক থেকে পাওয়া ব্যালেন্স
-                refBalance = data.referralEarnings || 0;       // রেফারেল থেকে পাওয়া ব্যালেন্স
-                totalBalance = taskBalance + refBalance;       // মোট ব্যালেন্স
+                taskBalance = data.balance || 0;               
+                refBalance = data.referralEarnings || 0;       
+                totalBalance = taskBalance + refBalance;       
                 
                 document.getElementById('myBal').innerText = totalBalance;
             }
         });
 
+        // ৩. উইথড্র রিকোয়েস্ট বাটনের কাজ
         document.getElementById('reqBtn').addEventListener('click', async () => {
             let method = document.getElementById('method').value;
             let acc = document.getElementById('accountNo').value;
             let amt = parseInt(document.getElementById('amount').value);
 
             if(!acc || !amt) return alert("Fill all details!");
-            if(amt < 5000) return alert("Minimum withdraw limit is 5000 Coins!");
+            
+            // ডায়নামিক লিমিট চেক
+            if(amt < minWithdrawLimit) return alert(`Minimum withdraw limit is ${minWithdrawLimit} Coins!`);
+            
             if(amt > totalBalance) return alert("Insufficient Balance!");
 
             // ড্যাশবোর্ড থেকে সঠিকভাবে কয়েন কাটার লজিক
@@ -78,16 +98,14 @@
             let newRefBal = refBalance;
 
             if (amt <= taskBalance) {
-                // যদি শুধু টাস্কের ব্যালেন্স দিয়েই উইথড্র হয়ে যায়
                 newTaskBal -= amt;
             } else {
-                // যদি টাস্কের ব্যালেন্স শেষ হয়ে যায়, তবে বাকিটা রেফারেল থেকে কাটবে
                 let remainingAmount = amt - taskBalance;
                 newTaskBal = 0;
                 newRefBal -= remainingAmount;
             }
 
-            // Deduct balance and send request
+            // ইউজারের ব্যালেন্স আপডেট ও রিকোয়েস্ট সেন্ড
             await update(ref(db, 'users/' + uid), { 
                 balance: newTaskBal,
                 referralEarnings: newRefBal
