@@ -4,32 +4,307 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background: #0f172a; color: white; padding-bottom: 20px; }
-        header { background: rgba(255,255,255,0.05); padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .status-badge { padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 14px; }
-        .unactive { background: #ef4444; } .active { background: #10b981; }
-        .balance-card { margin: 20px; padding: 20px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 15px; text-align: center; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
-        .balance-card h3 { font-size: 30px; }
-        .taka { font-size: 14px; color: #e2e8f0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
-        .stats { display: flex; justify-content: space-between; margin: 0 20px; gap: 10px; }
-        .stat-box { flex: 1; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        body { 
+            background: #000; 
+            color: white; 
+            padding-bottom: 30px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+            animation: bgMove 15s ease-in-out infinite;
+            z-index: -2;
+        }
+
+        @keyframes bgMove {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(3deg); }
+        }
+
+        /* Grid overlay */
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: -1;
+        }
+
+        header { 
+            background: rgba(255,255,255,0.03); 
+            padding: 25px 20px; 
+            border-bottom: 1px solid rgba(255,255,255,0.08); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .user-info h4 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-info h4 i {
+            color: #60a5fa;
+        }
+
+        .user-info small {
+            color: rgba(255,255,255,0.4);
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge { 
+            padding: 8px 20px; 
+            border-radius: 30px; 
+            font-weight: 600; 
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .unactive { 
+            background: linear-gradient(135deg, #ef4444, #dc2626); 
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        } 
         
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
-        .menu-btn { padding: 20px; background: rgba(255,255,255,0.05); border-radius: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: 0.3s; color: white; text-decoration: none; position: relative; }
-        .menu-btn i { font-size: 30px; margin-bottom: 10px; color: #10b981; }
-        .menu-btn.locked { opacity: 0.5; cursor: not-allowed; }
-        .menu-btn.locked::after { content: "\f023"; font-family: "FontAwesome"; position: absolute; top: 10px; right: 10px; color: #ef4444; }
+        .active { 
+            background: linear-gradient(135deg, #10b981, #059669); 
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .balance-card { 
+            margin: 25px 20px; 
+            padding: 35px 25px; 
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(139, 92, 246, 0.8)); 
+            border-radius: 24px; 
+            text-align: center; 
+            box-shadow: 
+                0 20px 40px -10px rgba(59, 130, 246, 0.4),
+                inset 0 1px 0 rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .balance-card p {
+            position: relative;
+            z-index: 1;
+            font-size: 14px;
+            color: rgba(255,255,255,0.8);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .balance-card h3 { 
+            font-size: 42px; 
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .balance-card h3 i {
+            font-size: 32px;
+            margin-right: 5px;
+            opacity: 0.9;
+        }
+
+        .taka { 
+            font-size: 16px; 
+            color: rgba(255,255,255,0.9); 
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stats { 
+            display: flex; 
+            justify-content: space-between; 
+            margin: 0 20px; 
+            gap: 15px; 
+        }
+        
+        .stat-box { 
+            flex: 1; 
+            background: rgba(255,255,255,0.03); 
+            padding: 25px 15px; 
+            border-radius: 20px; 
+            text-align: center; 
+            border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .stat-box p {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-box h3 {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        #uLevel { color: #fbbf24; text-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
+        #refCount { color: #60a5fa; text-shadow: 0 0 20px rgba(96, 165, 250, 0.3); }
+        
+        .menu-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 20px; 
+            padding: 25px 20px; 
+        }
+        
+        .menu-btn { 
+            padding: 30px 20px; 
+            background: rgba(255,255,255,0.03); 
+            border-radius: 20px; 
+            text-align: center; 
+            border: 1px solid rgba(255,255,255,0.08); 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            color: white; 
+            text-decoration: none; 
+            position: relative;
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .menu-btn:hover::before {
+            opacity: 1;
+        }
+        
+        .menu-btn i { 
+            font-size: 32px; 
+            margin-bottom: 15px; 
+            color: #34d399;
+            display: block;
+            transition: transform 0.3s;
+        }
+
+        .menu-btn:hover i {
+            transform: scale(1.1);
+        }
+
+        .menu-btn span {
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        .menu-btn.locked { 
+            opacity: 0.4; 
+            cursor: not-allowed;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .menu-btn.locked i {
+            color: #6b7280;
+        }
+        
+        .menu-btn.locked::after { 
+            content: "\f023"; 
+            font-family: "FontAwesome"; 
+            position: absolute; 
+            top: 15px; 
+            right: 15px; 
+            color: #ef4444;
+            font-size: 16px;
+            background: rgba(239, 68, 68, 0.1);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .menu-btn:not(.locked):hover {
+            transform: translateY(-5px);
+            border-color: rgba(52, 211, 153, 0.3);
+            box-shadow: 0 10px 30px -10px rgba(52, 211, 153, 0.2);
+        }
     </style>
 </head>
 <body>
+    <div class="bg-animation"></div>
+    <div class="grid-overlay"></div>
+
     <header>
-        <div>
-            <h4><i class="fas fa-user"></i> <span id="uName">Loading...</span></h4>
+        <div class="user-info">
+            <h4><i class="fas fa-user-circle"></i> <span id="uName">Loading...</span></h4>
             <small>UID: <span id="uId">...</span></small>
         </div>
         <div class="status-badge unactive" id="accStatus">Unactive</div>
@@ -44,26 +319,30 @@
     <div class="stats">
         <div class="stat-box">
             <p>Level</p>
-            <h3 id="uLevel" style="color:#f59e0b;">0</h3>
+            <h3 id="uLevel">0</h3>
         </div>
         <div class="stat-box">
             <p>Active Refs</p>
-            <h3 id="refCount" style="color:#3b82f6;">0</h3>
+            <h3 id="refCount">0</h3>
         </div>
     </div>
 
     <div class="menu-grid">
         <a href="task.html" class="menu-btn" id="taskBtn">
-            <i class="fas fa-tasks"></i><br>Daily Tasks
+            <i class="fas fa-tasks"></i>
+            <span>Daily Tasks</span>
         </a>
         <a href="referral.html" class="menu-btn locked" id="refBtn">
-            <i class="fas fa-users"></i><br>Referral
+            <i class="fas fa-users"></i>
+            <span>Referral</span>
         </a>
         <a href="monthly_weekly.html" class="menu-btn locked" id="weeklyBtn">
-            <i class="fas fa-calendar-alt"></i><br>Monthly/Weekly
+            <i class="fas fa-calendar-alt"></i>
+            <span>Monthly/Weekly</span>
         </a>
         <a href="withdraw.html" class="menu-btn locked" id="withdrawBtn">
-            <i class="fas fa-wallet"></i><br>Withdraw
+            <i class="fas fa-wallet"></i>
+            <span>Withdraw</span>
         </a>
     </div>
 
