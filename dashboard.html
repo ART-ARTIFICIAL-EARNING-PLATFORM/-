@@ -92,36 +92,45 @@
             const data = snapshot.val();
             if(data) {
                 document.getElementById('uName').innerText = data.name;
-                document.getElementById('coins').innerText = data.balance;
-                document.getElementById('taka').innerText = ((data.balance / 1000) * 17).toFixed(2);
+                document.getElementById('coins').innerText = data.balance || 0;
+                document.getElementById('taka').innerText = (((data.balance || 0) / 1000) * 17).toFixed(2);
                 document.getElementById('refCount').innerText = data.activeRefs || 0;
                 
                 let statusEl = document.getElementById('accStatus');
-                let tasksDone = data.tasksCompleted || 0;
+                
+                // বাগ ফিক্স: successCount চেক করা হচ্ছে। (tasksCompleted ব্যাকআপ হিসেবে রাখা হলো)
+                let tasksDone = data.successCount || data.tasksCompleted || 0; 
                 let activeRefs = data.activeRefs || 0;
                 let currentLevel = 0;
 
-                // Level Logic
+                // Level & Active Status Logic
                 if(tasksDone >= 2) {
                     statusEl.innerText = "Active";
                     statusEl.className = "status-badge active";
                     currentLevel = 1;
+                    
                     if(activeRefs >= 10) currentLevel = 2;
                     if(activeRefs >= 20) currentLevel = 3;
                     if(activeRefs >= 40) currentLevel = 4;
                     
-                    update(ref(db, 'users/' + uid), { status: "Active", level: currentLevel });
+                    // বাগ ফিক্স: ইনফিনিট লুপ এড়াতে শুধু পরিবর্তন হলেই ডাটাবেস আপডেট করবে
+                    if (data.status !== "Active" || data.level !== currentLevel) {
+                        update(ref(db, 'users/' + uid), { status: "Active", level: currentLevel });
+                    }
+                } else {
+                    statusEl.innerText = "Unactive";
+                    statusEl.className = "status-badge unactive";
                 }
 
                 document.getElementById('uLevel').innerText = currentLevel;
 
-                // Unlock Logic
+                // Unlock Menu Logic
                 if(currentLevel >= 1) {
                     unlockBtn('refBtn');
                     unlockBtn('withdrawBtn');
                 }
                 
-                // Monthly/Weekly unlock at Level 2 (as per your first instruction)
+                // Monthly/Weekly unlock at Level 2
                 if(currentLevel >= 2) {
                     unlockBtn('weeklyBtn');
                 }
@@ -133,12 +142,12 @@
             if(btn) btn.classList.remove('locked');
         }
 
-        // বাগ ফিক্স: ডায়নামিকভাবে চেক করবে বাটনটা লক কিনা!
+        // Locked বাটনগুলোতে ক্লিক করলে অ্যালার্ট দেখাবে
         document.querySelectorAll('.menu-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 if(btn.classList.contains('locked')) {
                     e.preventDefault();
-                    alert("This feature is currently locked! Check Level requirements.");
+                    alert("This feature is currently locked! Please complete tasks/referrals to unlock.");
                 }
             });
         });
