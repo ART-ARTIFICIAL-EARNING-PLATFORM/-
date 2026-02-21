@@ -92,18 +92,26 @@
             const data = snapshot.val();
             if(data) {
                 document.getElementById('uName').innerText = data.name;
-                document.getElementById('coins').innerText = data.balance || 0;
-                document.getElementById('taka').innerText = (((data.balance || 0) / 1000) * 17).toFixed(2);
+                
+                // ==========================================
+                // ব্যালেন্স ক্যালকুলেশন ফিক্স (Task + Referral)
+                // ==========================================
+                let taskCoins = data.balance || 0;              // টাস্ক থেকে পাওয়া ব্যালেন্স
+                let referralCoins = data.referralEarnings || 0; // রেফারেল থেকে পাওয়া ব্যালেন্স
+                let totalCoins = taskCoins + referralCoins;     // মোট ব্যালেন্স
+
+                document.getElementById('coins').innerText = totalCoins;
+                document.getElementById('taka').innerText = ((totalCoins / 1000) * 17).toFixed(2);
+                
+                // রেফারেল কাউন্ট
                 document.getElementById('refCount').innerText = data.activeRefs || 0;
                 
                 let statusEl = document.getElementById('accStatus');
-                
-                // বাগ ফিক্স: successCount চেক করা হচ্ছে। (tasksCompleted ব্যাকআপ হিসেবে রাখা হলো)
                 let tasksDone = data.successCount || data.tasksCompleted || 0; 
                 let activeRefs = data.activeRefs || 0;
                 let currentLevel = 0;
 
-                // Level & Active Status Logic
+                // লেভেল এবং অ্যাকটিভ স্ট্যাটাস লজিক
                 if(tasksDone >= 2) {
                     statusEl.innerText = "Active";
                     statusEl.className = "status-badge active";
@@ -113,7 +121,6 @@
                     if(activeRefs >= 20) currentLevel = 3;
                     if(activeRefs >= 40) currentLevel = 4;
                     
-                    // বাগ ফিক্স: ইনফিনিট লুপ এড়াতে শুধু পরিবর্তন হলেই ডাটাবেস আপডেট করবে
                     if (data.status !== "Active" || data.level !== currentLevel) {
                         update(ref(db, 'users/' + uid), { status: "Active", level: currentLevel });
                     }
@@ -124,13 +131,12 @@
 
                 document.getElementById('uLevel').innerText = currentLevel;
 
-                // Unlock Menu Logic
+                // মেনু আনলক লজিক
                 if(currentLevel >= 1) {
                     unlockBtn('refBtn');
                     unlockBtn('withdrawBtn');
                 }
                 
-                // Monthly/Weekly unlock at Level 2
                 if(currentLevel >= 2) {
                     unlockBtn('weeklyBtn');
                 }
@@ -142,7 +148,6 @@
             if(btn) btn.classList.remove('locked');
         }
 
-        // Locked বাটনগুলোতে ক্লিক করলে অ্যালার্ট দেখাবে
         document.querySelectorAll('.menu-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 if(btn.classList.contains('locked')) {
