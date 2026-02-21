@@ -4,20 +4,287 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Targets</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background: #0f172a; color: white; padding: 20px; }
-        .card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
-        .btn { width: 100%; padding: 12px; background: #3b82f6; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-green { background: #10b981; }
-        .progress-text { color: #f59e0b; font-weight: bold; margin-top: 10px; text-align: center;}
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { 
+            background: #000; 
+            color: white; 
+            padding: 25px 20px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+            animation: bgMove 15s ease-in-out infinite;
+            z-index: -2;
+        }
+
+        @keyframes bgMove {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(3deg); }
+        }
+
+        /* Grid overlay */
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: -1;
+        }
+
+        h2 {
+            text-align: center;
+            color: #34d399;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        h2 i {
+            font-size: 32px;
+        }
+
+        .card { 
+            background: rgba(255,255,255,0.03); 
+            padding: 30px 25px; 
+            border-radius: 24px; 
+            border: 1px solid rgba(255,255,255,0.08); 
+            margin-bottom: 20px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .card h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card p {
+            font-size: 15px;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card p i {
+            color: #60a5fa;
+            width: 20px;
+        }
+
+        .card p b {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .btn { 
+            width: 100%; 
+            padding: 18px; 
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); 
+            border: none; 
+            border-radius: 14px; 
+            color: white; 
+            font-weight: 600; 
+            cursor: pointer; 
+            margin-top: 20px;
+            font-size: 16px;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.4);
+            z-index: 1;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px -10px rgba(59, 130, 246, 0.5);
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-green { 
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-green:hover {
+            box-shadow: 0 15px 35px -10px rgba(16, 185, 129, 0.5);
+        }
+
+        .btn-red {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            box-shadow: 0 10px 30px -10px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-red:hover {
+            box-shadow: 0 15px 35px -10px rgba(239, 68, 68, 0.5);
+        }
+
+        .progress-text { 
+            color: #fbbf24; 
+            font-weight: 700; 
+            margin-top: 20px; 
+            text-align: center;
+            font-size: 18px;
+            background: rgba(251, 191, 36, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .status-pending {
+            border-color: rgba(59, 130, 246, 0.3) !important;
+            background: rgba(59, 130, 246, 0.05) !important;
+        }
+
+        .status-pending h3 {
+            color: #60a5fa;
+        }
+
+        .status-active {
+            border-color: rgba(16, 185, 129, 0.3) !important;
+            background: rgba(16, 185, 129, 0.05) !important;
+        }
+
+        .status-active h3 {
+            color: #34d399;
+        }
+
+        .status-completed {
+            border-color: rgba(16, 185, 129, 0.3) !important;
+            background: rgba(16, 185, 129, 0.05) !important;
+        }
+
+        .status-completed h3 {
+            color: #34d399;
+        }
+
+        .status-failed {
+            border-color: rgba(239, 68, 68, 0.3) !important;
+            background: rgba(239, 68, 68, 0.05) !important;
+        }
+
+        .status-failed h3 {
+            color: #ef4444;
+        }
+
+        .status-payment {
+            border-color: rgba(251, 191, 36, 0.3) !important;
+            background: rgba(251, 191, 36, 0.05) !important;
+        }
+
+        .status-payment h3 {
+            color: #fbbf24;
+        }
+
+        .time-left {
+            text-align: center;
+            margin-top: 15px;
+            color: #ef4444;
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .time-left i {
+            font-size: 18px;
+        }
+
+        /* Floating particles */
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .particle:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { top: 70%; left: 90%; animation-delay: 2s; }
+        .particle:nth-child(3) { top: 30%; left: 80%; animation-delay: 4s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.2; }
+            50% { transform: translateY(-30px) scale(1.2); opacity: 0.5; }
+        }
     </style>
 </head>
 <body>
-    <h2 style="text-align:center; color:#10b981; margin-bottom: 20px;">Available Targets</h2>
+    <div class="bg-animation"></div>
+    <div class="grid-overlay"></div>
+
+    <h2><i class="fas fa-bullseye"></i> Available Targets</h2>
     
-    <div id="myStatus" class="card" style="display:none; border-color: #f59e0b;"></div>
+    <div id="myStatus" class="card" style="display:none;"></div>
     <div id="targetList"></div>
 
     <script type="module">
@@ -62,31 +329,64 @@
                 statusDiv.style.display = 'block';
 
                 if(data.status === "Pending Approval") {
-                    statusDiv.innerHTML = `<h3 style="color:#3b82f6">Status: Pending</h3><p>Admin is reviewing your application for ${data.type} target.</p>`;
+                    statusDiv.className = 'card status-pending';
+                    statusDiv.innerHTML = `
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <h3><i class="fas fa-clock"></i> Status: Pending</h3>
+                        <p>Admin is reviewing your application for ${data.type} target.</p>
+                    `;
                 } 
                 else if(data.status === "Active") {
-                    let progress = myActiveRefs - data.initialRefs; // Calculate newly added refs
+                    let progress = myActiveRefs - data.initialRefs;
                     
-                    // মাইনাস ফিগার এড়ানোর জন্য সেফটি চেক
                     if (progress < 0) progress = 0;
 
                     let timeLeft = data.deadline - Date.now();
                     let daysLeft = Math.ceil(timeLeft / (1000 * 60 * 60 * 24));
 
                     if(timeLeft <= 0) {
-                        statusDiv.innerHTML = `<h3 style="color:#ef4444">Time Over!</h3><p>You failed to complete the target.</p><button class="btn" onclick="retryTarget()">Try Again</button>`;
-                    } else if(progress >= data.accRequired) {
-                        statusDiv.innerHTML = `<h3 style="color:#10b981">Target Completed!</h3><p>You have successfully activated ${progress} accounts.</p><button class="btn btn-green" onclick="requestPayment()">Apply for Payment</button>`;
-                    } else {
+                        statusDiv.className = 'card status-failed';
                         statusDiv.innerHTML = `
-                            <h3>Active: ${data.type} Level ${data.level}</h3>
-                            <div class="progress-text">Progress: ${progress} / ${data.accRequired} Accounts</div>
-                            <p style="text-align:center; margin-top:5px; color:#ef4444;">Time Left: ${daysLeft} Days</p>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <h3><i class="fas fa-times-circle"></i> Time Over!</h3>
+                            <p>You failed to complete the target.</p>
+                            <button class="btn btn-red" onclick="retryTarget()"><i class="fas fa-redo"></i> Try Again</button>
+                        `;
+                    } else if(progress >= data.accRequired) {
+                        statusDiv.className = 'card status-completed';
+                        statusDiv.innerHTML = `
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <h3><i class="fas fa-check-circle"></i> Target Completed!</h3>
+                            <p>You have successfully activated ${progress} accounts.</p>
+                            <button class="btn btn-green" onclick="requestPayment()"><i class="fas fa-money-bill-wave"></i> Apply for Payment</button>
+                        `;
+                    } else {
+                        statusDiv.className = 'card status-active';
+                        statusDiv.innerHTML = `
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <h3><i class="fas fa-play-circle"></i> Active: ${data.type} Level ${data.level}</h3>
+                            <div class="progress-text"><i class="fas fa-chart-line"></i> Progress: ${progress} / ${data.accRequired} Accounts</div>
+                            <div class="time-left"><i class="fas fa-hourglass-half"></i> Time Left: ${daysLeft} Days</div>
                         `;
                     }
                 }
                 else if(data.status === "Payment Requested") {
-                    statusDiv.innerHTML = `<h3 style="color:#10b981">Payment Requested!</h3><p>Admin is verifying your work. Please wait.</p>`;
+                    statusDiv.className = 'card status-payment';
+                    statusDiv.innerHTML = `
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <h3><i class="fas fa-money-check-alt"></i> Payment Requested!</h3>
+                        <p>Admin is verifying your work. Please wait.</p>
+                    `;
                 }
             }
         });
@@ -98,11 +398,14 @@
                     let d = child.val();
                     html += `
                     <div class="card">
-                        <h3 style="color:#3b82f6">${d.type} Target - Level ${d.level}</h3>
-                        <p>🎯 Goal: Activate <b>${d.accRequired}</b> Accounts</p>
-                        <p>⏳ Time: <b>${d.days}</b> Days</p>
-                        <p>💰 Reward: <b>${d.rewardCoins}</b> Coins</p>
-                        <button class="btn" onclick="applyTarget('${child.key}', '${d.type}', ${d.level}, ${d.days}, ${d.accRequired}, ${d.rewardCoins})">Apply Now</button>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <h3 style="color:#60a5fa"><i class="fas fa-trophy"></i> ${d.type} Target - Level ${d.level}</h3>
+                        <p><i class="fas fa-bullseye"></i> Goal: <b>${d.accRequired}</b> Accounts</p>
+                        <p><i class="fas fa-clock"></i> Time: <b>${d.days}</b> Days</p>
+                        <p><i class="fas fa-coins"></i> Reward: <b>${d.rewardCoins}</b> Coins</p>
+                        <button class="btn" onclick="applyTarget('${child.key}', '${d.type}', ${d.level}, ${d.days}, ${d.accRequired}, ${d.rewardCoins})"><i class="fas fa-rocket"></i> Apply Now</button>
                     </div>`;
                 });
                 document.getElementById('targetList').innerHTML = html;
@@ -123,7 +426,7 @@
         }
 
         window.retryTarget = function() {
-            set(ref(db, 'target_requests/' + uid), null); // Delete failed request
+            set(ref(db, 'target_requests/' + uid), null);
             window.location.reload();
         }
     </script>
