@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* আপনার সব CSS হুবহু সেম আছে */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
         body { 
@@ -18,7 +19,6 @@
             overflow-x: hidden;
         }
 
-        /* Animated background */
         .bg-animation {
             position: fixed;
             top: 0;
@@ -38,7 +38,6 @@
             50% { transform: scale(1.1) rotate(3deg); }
         }
 
-        /* Grid overlay */
         .grid-overlay {
             position: fixed;
             top: 0;
@@ -68,9 +67,7 @@
             gap: 12px;
         }
 
-        .header h2 i {
-            color: #34d399;
-        }
+        .header h2 i { color: #34d399; }
 
         .header a {
             display: inline-flex;
@@ -113,10 +110,7 @@
             gap: 5px;
         }
 
-        .stats-bar span span {
-            font-size: 24px;
-            font-weight: 700;
-        }
+        .stats-bar span span { font-size: 24px; font-weight: 700; }
 
         .text-green { color: #34d399; text-shadow: 0 0 20px rgba(52, 211, 153, 0.3); } 
         .text-red { color: #ef4444; text-shadow: 0 0 20px rgba(239, 68, 68, 0.3); } 
@@ -189,13 +183,8 @@
             box-shadow: 0 15px 35px -10px rgba(59, 130, 246, 0.5);
         }
 
-        button:hover::before {
-            left: 100%;
-        }
-
-        button:active {
-            transform: translateY(-1px);
-        }
+        button:hover::before { left: 100%; }
+        button:active { transform: translateY(-1px); }
 
         button:disabled { 
             background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
@@ -204,9 +193,7 @@
             transform: none;
         }
 
-        button:disabled::before {
-            display: none;
-        }
+        button:disabled::before { display: none; }
 
         #statusMsg {
             text-align: center;
@@ -223,141 +210,49 @@
         }
 
         .copy-group { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            background: rgba(0,0,0,0.3); 
-            padding: 18px 20px; 
-            border-radius: 14px; 
-            margin-bottom: 15px;
-            border: 1px solid rgba(255,255,255,0.08);
-            transition: all 0.3s;
+            display: flex; justify-content: space-between; align-items: center; 
+            background: rgba(0,0,0,0.3); padding: 18px 20px; border-radius: 14px; margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.08); transition: all 0.3s;
         }
-
-        .copy-group:hover {
-            border-color: rgba(255,255,255,0.15);
-            background: rgba(0,0,0,0.4);
-        }
-
-        .copy-group span {
-            font-size: 14px;
-            color: rgba(255,255,255,0.8);
-            flex: 1;
-            margin-right: 15px;
-            word-break: break-all;
-        }
-
-        .copy-group span b {
-            color: #34d399;
-            display: block;
-            margin-bottom: 5px;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        .copy-group:hover { border-color: rgba(255,255,255,0.15); background: rgba(0,0,0,0.4); }
+        .copy-group span { font-size: 14px; color: rgba(255,255,255,0.8); flex: 1; margin-right: 15px; word-break: break-all; }
+        .copy-group span b { color: #34d399; display: block; margin-bottom: 5px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
 
         .copy-btn { 
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); 
-            padding: 10px 18px; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            border: none; 
-            color: white; 
-            width: auto;
-            font-weight: 600;
-            font-size: 13px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); padding: 10px 18px; 
+            border-radius: 10px; cursor: pointer; border: none; color: white; width: auto;
+            font-weight: 600; font-size: 13px; transition: all 0.3s; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
         }
-
-        .copy-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
-        }
+        .copy-btn:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
 
         input { 
-            width: 100%; 
-            padding: 18px 20px; 
-            margin-bottom: 15px; 
-            background: rgba(0,0,0,0.3); 
-            border: 1px solid rgba(255,255,255,0.1); 
-            color: white; 
-            border-radius: 14px;
-            font-size: 15px;
-            outline: none;
-            transition: all 0.3s;
+            width: 100%; padding: 18px 20px; margin-bottom: 15px; background: rgba(0,0,0,0.3); 
+            border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 14px;
+            font-size: 15px; outline: none; transition: all 0.3s;
         }
-
-        input:focus {
-            border-color: rgba(52, 211, 153, 0.5);
-            box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.1);
-        }
-
-        input::placeholder {
-            color: rgba(255,255,255,0.3);
-        }
+        input:focus { border-color: rgba(52, 211, 153, 0.5); box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.1); }
+        input::placeholder { color: rgba(255,255,255,0.3); }
 
         #taskDetails, #submitSection { display: none; }
 
         #timerBox { 
-            text-align: center; 
-            font-size: 32px; 
-            font-weight: 700; 
-            color: #ef4444; 
-            margin-bottom: 25px;
-            background: rgba(239, 68, 68, 0.1);
-            padding: 25px 20px;
-            border-radius: 20px;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            text-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
-            animation: pulse 2s ease-in-out infinite;
+            text-align: center; font-size: 32px; font-weight: 700; color: #ef4444; 
+            margin-bottom: 25px; background: rgba(239, 68, 68, 0.1); padding: 25px 20px;
+            border-radius: 20px; border: 1px solid rgba(239, 68, 68, 0.2); display: flex;
+            align-items: center; justify-content: center; gap: 10px;
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.3); animation: pulse 2s ease-in-out infinite;
         }
+        @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2); } 50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } }
+        #timerBox i { font-size: 28px; }
+        #dataFields { position: relative; z-index: 1; }
+        #submitSection button { background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.4); }
+        #submitSection button:hover { box-shadow: 0 15px 35px -10px rgba(16, 185, 129, 0.5); }
 
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2); }
-            50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-        }
-
-        #timerBox i {
-            font-size: 28px;
-        }
-
-        #dataFields {
-            position: relative;
-            z-index: 1;
-        }
-
-        #submitSection button {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.4);
-        }
-
-        #submitSection button:hover {
-            box-shadow: 0 15px 35px -10px rgba(16, 185, 129, 0.5);
-        }
-
-        /* Floating particles */
-        .particle {
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 50%;
-            animation: float 8s ease-in-out infinite;
-        }
-
+        .particle { position: absolute; width: 3px; height: 3px; background: rgba(255,255,255,0.2); border-radius: 50%; animation: float 8s ease-in-out infinite; }
         .particle:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
         .particle:nth-child(2) { top: 70%; left: 90%; animation-delay: 2s; }
         .particle:nth-child(3) { top: 30%; left: 80%; animation-delay: 4s; }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) scale(1); opacity: 0.2; }
-            50% { transform: translateY(-30px) scale(1.2); opacity: 0.5; }
-        }
+        @keyframes float { 0%, 100% { transform: translateY(0) scale(1); opacity: 0.2; } 50% { transform: translateY(-30px) scale(1.2); opacity: 0.5; } }
     </style>
 </head>
 <body>
@@ -377,9 +272,7 @@
     </div>
 
     <div class="glass-card" id="applySection">
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
+        <div class="particle"></div><div class="particle"></div><div class="particle"></div>
         <h3>Apply for Task</h3>
         <button id="applyBtn">Apply Now</button>
         <p id="statusMsg"></p>
@@ -400,25 +293,30 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getDatabase, ref, set, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+        import { getDatabase, ref, set, onValue, update, remove, push, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
         const app = initializeApp({
             databaseURL: "https://tk65-58e25-default-rtdb.firebaseio.com",
             projectId: "tk65-58e25"
         });
         const db = getDatabase(app);
-        const uid = localStorage.getItem("uid"); // Make sure this is set on login
+        const uid = localStorage.getItem("uid"); 
 
         if(!uid) window.location.href = "login.html";
 
-        const taskRef = ref(db, 'tasks/' + uid);
         const userRef = ref(db, 'users/' + uid);
 
         let userName = "User";
-        let userStats = { success: 0, fail: 0, pending: 0, lastSubmitTime: 0, banUntil: 0 };
+        let userStats = { success: 0, fail: 0, lastSubmitTime: 0, banUntil: 0 };
         let timerInterval;
+        let globalUIInterval;
+        let adminRestUntil = 0;
 
-        // Fetch User Data & Stats
+        let activeTaskId = null;
+        let activeTaskData = null;
+        let pendingCount = 0;
+
+        // Fetch User Stats
         onValue(userRef, (snap) => { 
             if(snap.exists()) {
                 let data = snap.val();
@@ -433,78 +331,109 @@
             } 
         });
 
-        // Handle Task Updates
-        onValue(taskRef, (snapshot) => {
-            const data = snapshot.val();
-            let statusMsg = document.getElementById('statusMsg');
-            let applyBtn = document.getElementById('applyBtn');
+        // Listen for Admin Rest Time
+        onValue(ref(db, 'admin_status/restUntil'), (snap) => {
+            adminRestUntil = snap.val() || 0;
+        });
+
+        // Query Multiple Tasks for the user
+        const tasksQuery = query(ref(db, 'tasks'), orderByChild('userId'), equalTo(uid));
+        
+        onValue(tasksQuery, (snapshot) => {
+            activeTaskId = null;
+            activeTaskData = null;
+            pendingCount = 0;
+
+            snapshot.forEach((child) => {
+                let t = child.val();
+                if (t.status === "requested" || t.status === "assigned") {
+                    // This is the active task the user is currently waiting for or doing
+                    activeTaskId = child.key;
+                    activeTaskData = t;
+                }
+                if (t.status === "submitted") {
+                    // Increment pending for tasks waiting on admin review
+                    pendingCount++;
+                }
+            });
+
+            // Update UI based on active task
+            document.getElementById('pendingCount').innerText = pendingCount;
+            updateUI();
+        });
+
+        function updateUI() {
             let applySec = document.getElementById('applySection');
+            let applyBtn = document.getElementById('applyBtn');
             let taskDetails = document.getElementById('taskDetails');
             let submitSec = document.getElementById('submitSection');
+            let statusMsg = document.getElementById('statusMsg');
 
-            clearInterval(timerInterval); // Stop previous timers
-
-            if(!data) {
+            if (!activeTaskData) {
+                // No active task - Show apply section
                 applySec.style.display = 'block';
                 applyBtn.style.display = 'block';
                 taskDetails.style.display = 'none';
                 submitSec.style.display = 'none';
-                document.getElementById('pendingCount').innerText = "0";
 
-                // Check Cooldown and Ban
-                let now = Date.now();
-                if(userStats.banUntil > now) {
-                    applyBtn.disabled = true;
-                    statusMsg.innerText = `You are banned for ${Math.ceil((userStats.banUntil - now)/60000)} minutes.`;
-                } else if(now - userStats.lastSubmitTime < 60000) {
-                    applyBtn.disabled = true;
-                    let secLeft = 60 - Math.floor((now - userStats.lastSubmitTime)/1000);
-                    statusMsg.innerText = `Wait ${secLeft} seconds to apply again.`;
-                    setTimeout(() => statusMsg.innerText = "", secLeft * 1000);
-                    setTimeout(() => applyBtn.disabled = false, secLeft * 1000);
-                } else {
-                    applyBtn.disabled = false;
-                    statusMsg.innerText = "";
-                }
-
-            } else if (data.status === "requested") {
+            } else if (activeTaskData.status === "requested") {
+                applySec.style.display = 'block';
                 applyBtn.style.display = 'none';
-                statusMsg.innerText = "Loading... Waiting for Admin to send task.";
-                document.getElementById('pendingCount').innerText = "1";
-            } else if (data.status === "assigned") {
+                taskDetails.style.display = 'none';
+                submitSec.style.display = 'none';
+                statusMsg.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Waiting for Admin to send task...';
+
+            } else if (activeTaskData.status === "assigned") {
                 applySec.style.display = 'none';
                 taskDetails.style.display = 'block';
                 submitSec.style.display = 'block';
-                document.getElementById('pendingCount').innerText = "1";
                 
-                // Fields display
                 let fieldsHTML = "";
-                for(let key in data.adminData) {
-                    if(data.adminData[key]) {
+                for(let key in activeTaskData.adminData) {
+                    if(activeTaskData.adminData[key]) {
                         fieldsHTML += `
                         <div class="copy-group">
-                            <span><b>${key}:</b> <span id="${key.replace(/\s/g, '')}">${data.adminData[key]}</span></span>
+                            <span><b>${key}:</b> <span id="${key.replace(/\s/g, '')}">${activeTaskData.adminData[key]}</span></span>
                             <button class="copy-btn" onclick="copyText('${key.replace(/\s/g, '')}')"><i class="fas fa-copy"></i></button>
                         </div>`;
                     }
                 }
                 document.getElementById('dataFields').innerHTML = fieldsHTML;
 
-                // 13 Minute Timer Logic
-                startTimer(data.assignTime);
-
-            } else if (data.status === "submitted") {
-                applySec.style.display = 'block';
-                applyBtn.style.display = 'none';
-                taskDetails.style.display = 'none';
-                submitSec.style.display = 'none';
-                document.getElementById('pendingCount').innerText = "1";
-                statusMsg.innerText = "Task submitted! Admin is reviewing.";
+                clearInterval(timerInterval);
+                startTimer(activeTaskData.assignTime);
             }
-        });
+        }
+
+        // Global interval to check Cooldowns and Admin Rest Time
+        globalUIInterval = setInterval(() => {
+            if (!activeTaskData) {
+                let applyBtn = document.getElementById('applyBtn');
+                let statusMsg = document.getElementById('statusMsg');
+                let now = Date.now();
+
+                if (adminRestUntil > now) {
+                    applyBtn.disabled = true;
+                    let m = Math.floor((adminRestUntil - now) / 60000);
+                    let s = Math.floor(((adminRestUntil - now) % 60000) / 1000);
+                    statusMsg.innerHTML = `<i class="fas fa-bed"></i> Admin is on a break. Try again in ${m}m ${s}s.`;
+                } else if (userStats.banUntil > now) {
+                    applyBtn.disabled = true;
+                    let m = Math.ceil((userStats.banUntil - now) / 60000);
+                    statusMsg.innerHTML = `<i class="fas fa-ban"></i> You are banned. Try again in ${m} minutes.`;
+                } else if (now - userStats.lastSubmitTime < 60000) {
+                    applyBtn.disabled = true;
+                    let secLeft = 60 - Math.floor((now - userStats.lastSubmitTime) / 1000);
+                    statusMsg.innerHTML = `<i class="fas fa-clock"></i> Wait ${secLeft} seconds to apply again.`;
+                } else {
+                    applyBtn.disabled = false;
+                    statusMsg.innerText = pendingCount > 0 ? "You can apply for another task while previous is pending!" : "";
+                }
+            }
+        }, 1000);
 
         function startTimer(assignTime) {
-            let maxTime = 13 * 60 * 1000; // 13 minutes
+            let maxTime = 13 * 60 * 1000; 
             let display = document.getElementById('timerDisplay');
 
             timerInterval = setInterval(() => {
@@ -514,9 +443,8 @@
                 if (left <= 0) {
                     clearInterval(timerInterval);
                     alert("Time is up! Task Missed.");
-                    // Mark as Failed
                     update(userRef, { failCount: userStats.fail + 1 });
-                    remove(taskRef); // Delete task so user can apply again
+                    if(activeTaskId) remove(ref(db, 'tasks/' + activeTaskId)); // Delete task to unblock user
                 } else {
                     let m = Math.floor(left / 60000);
                     let s = Math.floor((left % 60000) / 1000);
@@ -526,7 +454,14 @@
         }
 
         document.getElementById('applyBtn').addEventListener('click', () => {
-            set(taskRef, { status: "requested", userName: userName, requestTime: Date.now() });
+            // Push a NEW task ID instead of overwriting existing one
+            const newTaskRef = push(ref(db, 'tasks'));
+            set(newTaskRef, { 
+                userId: uid, 
+                status: "requested", 
+                userName: userName, 
+                requestTime: Date.now() 
+            });
         });
 
         document.getElementById('submitTaskBtn').addEventListener('click', () => {
@@ -534,15 +469,19 @@
             let pass = document.getElementById('createdPass').value;
             if(!email || !pass) return alert("Enter both Email and Password!");
             
-            update(taskRef, {
-                status: "submitted",
-                userData: { email: email, password: pass }
-            });
-            // Update last submit time for 1 minute cooldown
-            update(userRef, { lastSubmitTime: Date.now() });
-            
-            document.getElementById('createdEmail').value = "";
-            document.getElementById('createdPass').value = "";
+            if (activeTaskId) {
+                update(ref(db, 'tasks/' + activeTaskId), {
+                    status: "submitted",
+                    userData: { email: email, password: pass }
+                });
+                
+                update(userRef, { lastSubmitTime: Date.now() });
+                
+                document.getElementById('createdEmail').value = "";
+                document.getElementById('createdPass').value = "";
+                
+                alert("Task submitted to pending! You can apply for another one immediately.");
+            }
         });
 
         window.copyText = function(id) {
